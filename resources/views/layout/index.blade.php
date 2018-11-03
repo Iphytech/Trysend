@@ -49,7 +49,7 @@
             $("#recipientaccount").keyup(function() {
                 var recipientaccount = $("#recipientaccount").val();
                 var destbankcode = $("#accountbank").val();
-                var PBFPubKey = 'FLWPUBK-3f9b0d8bc9eacc5ce6ee9e167c613c62-X'
+                var PBFPubKey = 'FLWPUBK-xxxxxxxxxxxxxxxxxxxxxxx-X'
                 var token = '<?php echo csrf_token() ?>';
 
                 if (recipientaccount.length === 10) { 
