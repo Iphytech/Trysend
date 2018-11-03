@@ -63,7 +63,7 @@ class RaveController extends Controller
                 'narration' => session('narration'),
                 'reference' => 'TS_'.time(),
                 'currency' => session('currency'),
-                'seckey' => 'FLWSECK-cdbf6713ce1ceb507b1f03fa44040f56-X',
+                'seckey' => 'FLWSECK-xxxxxxxxxxxxxxxxxxxxxxxxxxxxx-X',
                 'callback_url' => '/success'
             );
             $data = Rave::initiateTransfer($arrdata);
