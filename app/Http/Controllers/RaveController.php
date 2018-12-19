@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
+use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
+
 use Rave;
 
 class RaveController extends Controller
@@ -17,25 +20,27 @@ class RaveController extends Controller
      // return $banks;
         return view('home')->with('banks', $banks);
     }
+
     public function initialize(Request $request) {
         session([
             'bankcode' => $request->account_bank,
-            'acctnumber' => $request->account_number,
+            'acctnumber' => $request->recipientaccount,
             'narration' => $request->narration,
         ]);
 
         //This initializes payment and redirects to the payment gateway
         //The initialize method takes the parameter of the redirect URL
         Rave::initialize(route('callback'));
-      }
-      public function callback() {
-      // This verifies the transaction and takes the parameter of the transaction reference
+    }
+
+    public function callback() {
+        // This verifies the transaction and takes the parameter of the transaction reference
         $data = Rave::verifyTransaction(request()->txref);
-            $chargeResponsecode = $data->data->chargecode;
-            $chargeAmount = $data->data->amount;
-            $chargeCurrency = $data->data->currency;
-            $amount = $data->data->amount;
-            $currency = "NGN";
+        $chargeResponsecode = $data->data->chargecode;
+        $chargeAmount = $data->data->amount;
+        $chargeCurrency = $data->data->currency;
+        $amount = $data->data->amount;
+        $currency = "NGN";
 
         if (($chargeResponsecode == "00" || $chargeResponsecode == "0") && ($chargeAmount == $amount)  && ($chargeCurrency == $currency)) {
         // transaction was successful...
@@ -53,36 +58,46 @@ class RaveController extends Controller
             return redirect('/failed');
         }
             // dd($data);
-        }
-        public function initiateTransfer() {
-            // return session('bankcode');
-            $arrdata = array(
-                'account_bank' => session('bankcode'),
-                'account_number' => session('acctnumber'),
-                'amount' => session('amount'),
-                'narration' => session('narration'),
-                'reference' => 'TS_'.time(),
-                'currency' => session('currency'),
-                'seckey' => 'FLWSECK-cdbf6713ce1ceb507b1f03fa44040f56-X',
-                'callback_url' => '/success'
-            );
-            $data = Rave::initiateTransfer($arrdata);
-            // dd($data);
-            $status = $data->status;
+    }
 
-            if($status == 'success') {
-                return redirect('/success');
-            }
-            else {
-                return redirect('/failed');
-            }
+    public function initiateTransfer() {
+        // return session('bankcode');
+        $arrdata = array(
+            'account_bank' => session('bankcode'),
+            'account_number' => session('acctnumber'),
+            'amount' => session('amount'),
+            'narration' => session('narration'),
+            'reference' => 'TS_'.time(),
+            'currency' => session('currency'),
+            'seckey' => 'FLWSECK-xxxxxxxxxxxxxxxxxx-X',
+            'callback_url' => '/success'
+        );
+        
+        $data = Rave::initiateTransfer($arrdata);
+        dd($data);
+        // $status = $data->status;
 
-}
+        // if($status == 'success') {
+        //     return redirect('/success');
+        // }
+        // else {
+        //     return redirect('/failed');
+        //}
+
+    }
+
     public function success() {
         return 'Transfer is successful';
     }
     public function failed() {
         return 'Transfer is unsuccessful, Please try again';
+    }
+
+    public function webhook()
+    {
+        //This receives the webhook
+        $data = Rave::receiveWebhook();
+        Log::info(json_encode($data));
     }
 
 }

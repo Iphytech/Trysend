@@ -17,3 +17,4 @@ Route::post('/rave/callback', 'RaveController@callback')->name('callback');
 Route::get('/transfer', 'RaveController@initiateTransfer');
 Route::get('/success', 'RaveController@success');
 Route::get('/failed', 'RaveController@failed');
+Route::post('/rave/webhook', 'RaveController@webhook')->name('webhook');
